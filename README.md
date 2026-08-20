@@ -159,7 +159,7 @@ WorthIt 的基本分析单位是 `work_unit`，即一个边界清晰、可以独
 Skill 文件位于用户级 Codex Skills 目录：
 
 ```text
-C:\Users\yi\.codex\skills\worthit-evaluator
+<CODEX_HOME>/skills/worthit-evaluator
 ```
 
 主要文件：
@@ -272,7 +272,7 @@ Work Unit ROI
 扫描本机 Codex 会话日志：
 
 ```bash
-npm run worthit -- discover codex --path C:\Users\yi\.codex\sessions --save
+npm run worthit -- discover codex --path <CODEX_SESSIONS_PATH> --save
 ```
 
 系统会保存：
@@ -665,7 +665,7 @@ These scores are not absolute truth. They provide a consistent scale for directi
 The Skill is located in the user-level Codex Skills directory:
 
 ```text
-C:\Users\yi\.codex\skills\worthit-evaluator
+<CODEX_HOME>/skills/worthit-evaluator
 ```
 
 Main files:
@@ -777,7 +777,7 @@ Work-unit ROI
 Scan local Codex session logs:
 
 ```bash
-npm run worthit -- discover codex --path C:\Users\yi\.codex\sessions --save
+npm run worthit -- discover codex --path <CODEX_SESSIONS_PATH> --save
 ```
 
 WorthIt stores:
