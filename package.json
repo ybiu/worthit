@@ -1,0 +1,16 @@
+{
+  "name": "worthit",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local-first AI agent work ROI analytics",
+  "type": "module",
+  "scripts": {
+    "worthit": "node apps/cli/src/cli.mjs",
+    "validate": "node apps/cli/src/cli.mjs validate",
+    "analyze": "node apps/cli/src/cli.mjs analyze",
+    "web": "node apps/web/server.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,6 @@
+data/*.jsonl
+data/*.json
+reports/
+node_modules/
+.env
+_ref_chatlab/

@@ -1,0 +1,7 @@
+{
+  "provider": "example-provider",
+  "billing_period": "2026-08",
+  "amount_usd": 42.5,
+  "invoice_id": "invoice-example",
+  "notes": "Submitted provider invoice for reconciliation."
+}
