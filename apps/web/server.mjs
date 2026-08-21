@@ -7,6 +7,7 @@ import { JsonlStore } from "../../packages/core/src/store.mjs";
 
 const root = resolve(fileURLToPath(new URL("./public", import.meta.url)));
 const port = Number(process.env.PORT || 4173);
+const host = process.env.HOST || "0.0.0.0";
 const store = new JsonlStore(resolve(process.env.WORTHIT_DATA_DIR || "data"));
 
 const server = createServer(async (request, response) => {
@@ -40,8 +41,8 @@ const server = createServer(async (request, response) => {
   }
 });
 
-server.listen(port, "127.0.0.1", () => {
-  console.log(`WorthIt web running at http://127.0.0.1:${port}`);
+server.listen(port, host, () => {
+  console.log(`WorthIt web running at http://${host}:${port}`);
 });
 
 async function resolveConversationInput(input) {

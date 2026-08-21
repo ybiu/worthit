@@ -8,7 +8,8 @@
     "worthit": "node apps/cli/src/cli.mjs",
     "validate": "node apps/cli/src/cli.mjs validate",
     "analyze": "node apps/cli/src/cli.mjs analyze",
-    "web": "node apps/web/server.mjs"
+    "web": "node apps/web/server.mjs",
+    "start": "node apps/web/server.mjs"
   },
   "engines": {
     "node": ">=20"
