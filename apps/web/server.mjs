@@ -50,37 +50,7 @@ async function resolveConversationInput(input) {
   if (!text) {
     throw new Error("请粘贴对话文本。");
   }
-
-  const urls = [...text.matchAll(/https?:\/\/[^\s<>"')\]]+/gi)].map(
-    (match) => match[0].replace(/[.,;:!?]+$/, ""),
-  );
-  if (!urls.length) return text;
-
-  const linkedContents = [];
-  for (const value of [...new Set(urls)].slice(0, 3)) {
-    const url = new URL(value);
-    const response = await fetchConversationUrl(url);
-    linkedContents.push(`\n\n[Linked conversation: ${value}]\n${response}`);
-  }
-  return `${text}${linkedContents.join("")}`;
-}
-
-async function fetchConversationUrl(url) {
-  if (!["http:", "https:"].includes(url.protocol)) {
-    throw new Error("对话中的链接必须使用 HTTP 或 HTTPS 协议。");
-  }
-  const response = await fetch(url, {
-    headers: { "user-agent": "WorthIt conversation analyzer/0.1" },
-  });
-  if (!response.ok) {
-    throw new Error(`链接读取失败：HTTP ${response.status}`);
-  }
-  const contentType = response.headers.get("content-type") || "";
-  const content = await response.text();
-  if (contentType.includes("application/json")) {
-    return JSON.stringify(JSON.parse(content), null, 2);
-  }
-  return content;
+  return text;
 }
 
 async function serveStatic(request, response) {
