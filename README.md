@@ -202,6 +202,18 @@ Skill 的标准输出包含：
 
 ## CLI MVP
 
+## Web AI 分析
+
+Web 界面现在使用用户提供的 AI API 进行分析，而不是只使用本地规则：
+
+- 支持 OpenAI-compatible Chat Completions 接口
+- 页面填写 API Key、模型和 API 地址后开始分析
+- API Key 只用于当前请求，不写入分析记录、JSONL 或日志
+- 默认地址为 `https://api.openai.com/v1`，也可填写 DeepSeek、通义等兼容服务地址
+- 未填写 API Key 时不会执行本地替代分析
+
+Railway 部署时，模型调用费用由用户自己的 API 账户承担。请不要在不信任的部署地址输入 API Key。
+
 项目现在提供一个不依赖第三方包的 Node.js CLI。
 
 初始化本地数据目录：

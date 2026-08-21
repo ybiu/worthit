@@ -102,15 +102,24 @@ Assistant: 我会先拆解需求...
                 </div>
                 <div class="field-group compact">
                   <label for="model">模型</label>
-                  <input id="model" value="unknown" placeholder="可选" />
+                  <input id="model" value="gpt-4o-mini" placeholder="例如 gpt-4o-mini" />
                 </div>
+              </div>
+
+              <div class="field-group api-field">
+                <label for="apiKey">API Key <span class="required-mark">必填</span></label>
+                <input id="apiKey" type="password" autocomplete="off" placeholder="只在本次分析中使用，不会保存" />
+              </div>
+              <div class="field-group api-field">
+                <label for="baseUrl">API 地址 <span class="field-optional">可选</span></label>
+                <input id="baseUrl" value="https://api.openai.com/v1" placeholder="OpenAI-compatible API 地址" />
               </div>
 
               <button class="primary-button" id="analyzeButton">
                 <span class="button-icon">↗</span>
                 开始分析
               </button>
-              <p class="privacy-note"><span>⌁</span> 内容只发送到本机 WorthIt 服务，不会默认上传。</p>
+              <p class="privacy-note"><span>⌁</span> API Key 仅用于本次 AI 请求，不会写入分析记录。</p>
             </div>
 
             <div class="result-panel">
@@ -127,7 +136,7 @@ Assistant: 我会先拆解需求...
                     <span class="panel-kicker">02 / ANALYSIS</span>
                     <h2>对话价值报告</h2>
                   </div>
-                  <span class="mode-badge">HEURISTIC MVP</span>
+                  <span class="mode-badge">AI EVALUATION</span>
                 </div>
 
                 <div class="score-band">

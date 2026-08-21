@@ -1,5 +1,7 @@
 const textInput = document.querySelector("#conversationText");
 const modelInput = document.querySelector("#model");
+const apiKeyInput = document.querySelector("#apiKey");
+const baseUrlInput = document.querySelector("#baseUrl");
 const scenarioInput = document.querySelector("#scenario");
 const analyzeButton = document.querySelector("#analyzeButton");
 const charCount = document.querySelector("#charCount");
@@ -59,6 +61,8 @@ analyzeButton.addEventListener("click", async () => {
         text: textInput.value,
         options: {
           model: modelInput.value.trim() || "unknown",
+          apiKey: apiKeyInput.value.trim(),
+          baseUrl: baseUrlInput.value.trim(),
           scenario: scenarioInput.value,
         },
       }),
