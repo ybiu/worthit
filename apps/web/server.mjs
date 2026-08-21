@@ -35,6 +35,19 @@ const server = createServer(async (request, response) => {
       return;
     }
 
+    if (request.method === "GET" && request.url.startsWith("/api/history/item")) {
+      const requestUrl = new URL(request.url, "http://localhost");
+      const analyzedAt = requestUrl.searchParams.get("analyzed_at");
+      const analyses = await store.listConversationAnalyses();
+      const item = analyses.find((entry) => entry.analyzed_at === analyzedAt);
+      if (!item) {
+        sendJson(response, 404, { error: "分析记录不存在或已被清理。" });
+        return;
+      }
+      sendJson(response, 200, item);
+      return;
+    }
+
     await serveStatic(request, response);
   } catch (error) {
     sendJson(response, 400, { error: error.message });

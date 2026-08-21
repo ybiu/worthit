@@ -47,6 +47,7 @@
           </div>
           <div class="topbar-actions">
             <span class="topbar-chip">Local-first</span>
+            <button class="topbar-icon" id="settingsButton" title="设置">⚙</button>
             <button class="topbar-icon" id="clearWorkspace" title="清空当前工作区">⌫</button>
           </div>
         </header>
@@ -216,6 +217,22 @@ Assistant: 我会先拆解需求...
         </main>
         <footer class="footer">WorthIt · local-first AI value analytics</footer>
       </div>
+    </div>
+    <div class="modal-backdrop hidden" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <section class="settings-modal">
+        <div class="settings-header">
+          <div>
+            <span class="panel-kicker">PREFERENCES</span>
+            <h2 id="settingsTitle">分析设置</h2>
+          </div>
+          <button class="topbar-icon" id="closeSettings" title="关闭设置">×</button>
+        </div>
+        <p class="settings-copy">设置只保存在当前页面会话中。API Key 不会保存到服务器或分析记录。</p>
+        <div class="settings-field"><label for="settingsModel">模型</label><input id="settingsModel" placeholder="例如 gpt-4o-mini" /></div>
+        <div class="settings-field"><label for="settingsBaseUrl">API 地址</label><input id="settingsBaseUrl" placeholder="https://api.openai.com/v1" /></div>
+        <div class="settings-field"><label for="settingsApiKey">API Key</label><input id="settingsApiKey" type="password" autocomplete="off" placeholder="仅当前页面会话可用" /></div>
+        <div class="settings-actions"><button class="ghost-button" id="clearApiKey">清除 Key</button><button class="primary-button settings-save" id="saveSettings">保存设置</button></div>
+      </section>
     </div>
     <script src="/app.js"></script>
   </body>

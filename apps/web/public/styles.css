@@ -189,6 +189,17 @@ textarea:focus, input:focus, select:focus { border-color: rgba(16, 163, 127, .65
 .support-item div span { color: var(--text-tertiary); font-size: 11px; line-height: 1.5; }
 .footer { max-width: 1320px; margin: 0 auto; padding: 16px 0 24px; color: var(--text-tertiary); font-size: 11px; }
 .error { margin-top: 12px; color: var(--danger); font-size: 12px; text-align: center; }
+.modal-backdrop { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 20px; background: rgba(31, 38, 42, .28); backdrop-filter: blur(5px); }
+.settings-modal { width: min(460px, 100%); padding: 22px; border: 1px solid var(--border-strong); border-radius: 14px; background: var(--bg-secondary); box-shadow: 0 24px 60px rgba(24, 30, 34, .18); }
+.settings-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.settings-header h2 { margin: 0; font-size: 20px; font-weight: 650; }
+.settings-copy { margin: 14px 0 20px; color: var(--text-secondary); font-size: 12px; line-height: 1.6; }
+.settings-field + .settings-field { margin-top: 14px; }
+.settings-field label { margin-bottom: 7px; }
+.settings-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 22px; }
+.settings-save { width: auto; margin-top: 0; padding: 10px 16px; }
+.toast { position: fixed; right: 24px; bottom: 24px; z-index: 60; padding: 10px 14px; border: 1px solid rgba(16, 163, 127, .25); border-radius: 8px; background: var(--bg-secondary); color: var(--text-primary); box-shadow: var(--shadow-md); font-size: 12px; opacity: 0; transform: translateY(8px); transition: opacity .18s ease, transform .18s ease; pointer-events: none; }
+.toast.visible { opacity: 1; transform: translateY(0); }
 
 @media (max-width: 900px) {
   .app-shell { padding: 0; }

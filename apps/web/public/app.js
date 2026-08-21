@@ -8,6 +8,7 @@ const charCount = document.querySelector("#charCount");
 const recentList = document.querySelector("#recentList");
 const historyCount = document.querySelector("#historyCount");
 const pageTitle = document.querySelector("#pageTitle");
+const settingsModal = document.querySelector("#settingsModal");
 
 textInput.addEventListener("input", () => {
   charCount.textContent = `${textInput.value.length.toLocaleString()} characters`;
@@ -30,6 +31,22 @@ document.querySelectorAll(".nav-item").forEach((button) => {
 });
 
 document.querySelector("#refreshHistory").addEventListener("click", loadHistory);
+document.querySelector("#settingsButton").addEventListener("click", () => {
+  document.querySelector("#settingsModel").value = modelInput.value;
+  document.querySelector("#settingsBaseUrl").value = baseUrlInput.value;
+  document.querySelector("#settingsApiKey").value = apiKeyInput.value;
+  settingsModal.classList.remove("hidden");
+});
+document.querySelector("#closeSettings").addEventListener("click", closeSettings);
+settingsModal.addEventListener("click", (event) => { if (event.target === settingsModal) closeSettings(); });
+document.querySelector("#clearApiKey").addEventListener("click", () => { apiKeyInput.value = ""; document.querySelector("#settingsApiKey").value = ""; });
+document.querySelector("#saveSettings").addEventListener("click", () => {
+  modelInput.value = document.querySelector("#settingsModel").value.trim() || "gpt-4o-mini";
+  baseUrlInput.value = document.querySelector("#settingsBaseUrl").value.trim() || "https://api.openai.com/v1";
+  apiKeyInput.value = document.querySelector("#settingsApiKey").value.trim();
+  closeSettings();
+  showToast("设置已保存到当前页面会话");
+});
 
 document.querySelector("#clearWorkspace").addEventListener("click", () => {
   textInput.value = "";
@@ -116,15 +133,29 @@ async function loadHistory() {
       ? items.slice(0, 6).map((item) => {
           const score = item.conversation_quality?.overall_score_0_to_5;
           const goal = item.task?.goal || item.evidence?.first_user_request || "未命名分析";
-          return `<button class="recent-item" data-analysis-id="${escapeHtml(item.analyzed_at || "")}">
+          return `<button class="recent-item" data-analysis-id="${escapeHtml(item.analyzed_at || "")}" title="点击查看分析结果">
             <span class="recent-item-title">${escapeHtml(goal.slice(0, 38))}</span>
             <span class="recent-item-meta">${score == null ? "—" : `${score.toFixed(1)} / 5`} · ${formatDate(item.analyzed_at)}</span>
           </button>`;
         }).join("")
       : '<div class="recent-empty">还没有分析记录</div>';
+    recentList.querySelectorAll(".recent-item").forEach((item) => item.addEventListener("click", () => loadHistoryItem(item.dataset.analysisId)));
   } catch {
     recentList.innerHTML = '<div class="recent-empty">记录暂时不可用</div>';
   }
+}
+
+async function loadHistoryItem(analyzedAt) {
+  try {
+    const response = await fetch(`/api/history/item?analyzed_at=${encodeURIComponent(analyzedAt)}`);
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || "无法读取分析记录");
+    renderResult(result);
+    pageTitle.textContent = "分析记录";
+    document.querySelectorAll(".nav-item").forEach((item) => item.classList.remove("active"));
+    document.querySelector('[data-view="history"]').classList.add("active");
+    document.querySelector(".result-panel").scrollIntoView({ behavior: "smooth", block: "start" });
+  } catch (error) { showError(error.message); }
 }
 
 function showInsightHint() {
@@ -146,6 +177,15 @@ function showError(message) {
     analyzeButton.after(error);
   }
   error.textContent = message;
+}
+
+function closeSettings() { settingsModal.classList.add("hidden"); }
+function showToast(message) {
+  let toast = document.querySelector(".toast");
+  if (!toast) { toast = document.createElement("div"); toast.className = "toast"; document.body.append(toast); }
+  toast.textContent = message;
+  toast.classList.add("visible");
+  setTimeout(() => toast.classList.remove("visible"), 1800);
 }
 
 function formatNumber(value) {
