@@ -19,7 +19,7 @@ document.querySelectorAll(".nav-item").forEach((button) => {
     document.querySelectorAll(".nav-item").forEach((item) => item.classList.remove("active"));
     button.classList.add("active");
     const view = button.dataset.view;
-    pageTitle.textContent = view === "analyze" ? "AI值得吗？" : view === "history" ? "分析记录" : "总体洞察";
+    pageTitle.textContent = view === "analyze" ? "Token值不值？" : view === "history" ? "分析记录" : "总体洞察";
     if (view === "history") {
       loadHistory();
       document.querySelector(".input-panel").scrollIntoView({ behavior: "smooth", block: "start" });
@@ -166,7 +166,7 @@ function showInsightHint() {
 
 function setLoading(loading) {
   analyzeButton.disabled = loading;
-  analyzeButton.innerHTML = loading ? "<span>分析中…</span>" : '<span class="button-icon">↗</span>算算这次';
+  analyzeButton.innerHTML = loading ? "<span>分析中…</span>" : '<span class="button-icon">↗</span>算算这笔 Token';
 }
 
 function showError(message) {
