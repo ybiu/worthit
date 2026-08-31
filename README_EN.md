@@ -12,6 +12,12 @@ Copy the [`worthit`](worthit) directory into your Codex skills directory:
 <Codex skills directory>/worthit/
 ```
 
+Or use the Skills CLI:
+
+```bash
+npx skills add ybiu/worthit --skill worthit -g
+```
+
 Then invoke it in any task:
 
 ```text

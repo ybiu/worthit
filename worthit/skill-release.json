@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "skillId": "worthit",
+  "channel": "stable",
+  "version": "0.1.0",
+  "source": {
+    "repository": "https://github.com/ybiu/worthit"
+  }
+}

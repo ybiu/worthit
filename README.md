@@ -14,6 +14,12 @@ Copy the [`worthit`](worthit) folder into your Codex skills directory, then ask:
 Use $worthit to evaluate this AI-assisted task: [paste context, evidence, effort, and outcome].
 ```
 
+Or install it directly with the Skills CLI:
+
+```bash
+npx skills add ybiu/worthit --skill worthit -g
+```
+
 It returns a clear verdict, an evidence-based scorecard, and a machine-readable JSON record. It works even when model bills and token counts are unavailable.
 
 ## Repository layout

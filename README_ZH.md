@@ -12,6 +12,12 @@ WorthIt 不是只问「做完了吗」，而是帮助 AI 进一步判断：**这
 <Codex skills directory>/worthit/
 ```
 
+也可以使用 Skills CLI 安装：
+
+```bash
+npx skills add ybiu/worthit --skill worthit -g
+```
+
 在任务中直接使用：
 
 ```text
