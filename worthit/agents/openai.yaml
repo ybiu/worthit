@@ -1,0 +1,6 @@
+interface:
+  display_name: "WorthIt"
+  short_description: "Evaluate whether AI-assisted work was worth its cost."
+  default_prompt: "Use $worthit to evaluate whether this AI-assisted task was worth its cost and effort."
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,64 @@
+{
+  "schema_version": "1.0",
+  "verdict": "worth_it",
+  "work_unit": {
+    "title": "Add bilingual README navigation",
+    "scenario": "coding",
+    "goal": "Let Chinese- and English-speaking visitors reach the appropriate project documentation.",
+    "status": "delivered"
+  },
+  "evidence": [
+    {
+      "claim": "Chinese and English README files were added and linked from the project entry page.",
+      "source": "observed",
+      "reference": "repository files"
+    },
+    {
+      "claim": "The change is available in the default branch.",
+      "source": "reported",
+      "reference": "git history"
+    }
+  ],
+  "costs": {
+    "ai": {
+      "usd": null,
+      "tokens_in": null,
+      "tokens_out": null,
+      "models": [],
+      "source": "unknown"
+    },
+    "human": {
+      "hours": 0.5,
+      "usd": null,
+      "source": "estimated"
+    },
+    "other_usd": 0,
+    "total_estimated_usd": null,
+    "currency": "USD"
+  },
+  "value_scores": {
+    "delivery_value": 4,
+    "practical_value": 3,
+    "quality_or_rigor": 4,
+    "novelty_or_insight": null,
+    "adoption_confidence": 4
+  },
+  "value_assessment": {
+    "benefit_basis": "qualitative",
+    "estimated_benefit_usd": null,
+    "net_value_usd": null,
+    "benefit_cost_ratio": null,
+    "summary": "A small, complete change removes a real documentation barrier at low human effort; monetary ROI cannot be calculated from the available data."
+  },
+  "meta": {
+    "confidence_level": "medium",
+    "assumptions": [
+      "The documentation change is maintained as part of the project."
+    ],
+    "missing_fields": [
+      "AI usage cost",
+      "Reader adoption data"
+    ],
+    "next_measurement": "Track visits or contributor feedback from each language entry point."
+  }
+}

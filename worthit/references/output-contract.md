@@ -1,0 +1,69 @@
+# WorthIt output contract
+
+Return one valid JSON object after the human-readable assessment. Use `null` for unavailable scalar values and record missing information instead of guessing.
+
+```json
+{
+  "schema_version": "1.0",
+  "verdict": "promising",
+  "work_unit": {
+    "title": "",
+    "scenario": "coding",
+    "goal": "",
+    "status": "in_progress"
+  },
+  "evidence": [
+    {
+      "claim": "",
+      "source": "reported",
+      "reference": null
+    }
+  ],
+  "costs": {
+    "ai": {
+      "usd": null,
+      "tokens_in": null,
+      "tokens_out": null,
+      "models": [],
+      "source": "unknown"
+    },
+    "human": {
+      "hours": null,
+      "usd": null,
+      "source": "unknown"
+    },
+    "other_usd": null,
+    "total_estimated_usd": null,
+    "currency": "USD"
+  },
+  "value_scores": {
+    "delivery_value": null,
+    "practical_value": null,
+    "quality_or_rigor": null,
+    "novelty_or_insight": null,
+    "adoption_confidence": null
+  },
+  "value_assessment": {
+    "benefit_basis": "qualitative",
+    "estimated_benefit_usd": null,
+    "net_value_usd": null,
+    "benefit_cost_ratio": null,
+    "summary": ""
+  },
+  "meta": {
+    "confidence_level": "medium",
+    "assumptions": [],
+    "missing_fields": [],
+    "next_measurement": null
+  }
+}
+```
+
+## Field rules
+
+- `scenario` is one of `coding`, `research`, `writing`, `prototype`, `ops`, or `mixed`.
+- `status` is one of `planned`, `in_progress`, `delivered`, `adopted`, or `stopped`.
+- `evidence[].source` and each cost `source` are `observed`, `reported`, `estimated`, or `unknown`.
+- `benefit_basis` is `monetary` only when a stated, defensible benefit estimate is available; otherwise use `qualitative`.
+- Set `net_value_usd` and `benefit_cost_ratio` only when both an estimated benefit and an estimated total cost are available.
+- `verdict` is `worth_it`, `promising`, `not_yet`, or `not_worth_it`.
