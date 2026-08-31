@@ -6,11 +6,28 @@ Return one valid JSON object after the human-readable assessment. Use `null` for
 {
   "schema_version": "1.0",
   "verdict": "promising",
+  "evaluation_source": "conversation_and_project",
   "work_unit": {
     "title": "",
     "scenario": "coding",
     "goal": "",
-    "status": "in_progress"
+    "status": "in_progress",
+    "starting_state": "",
+    "ai_contribution": "",
+    "human_contribution": ""
+  },
+  "conversation_trace": {
+    "turns_considered": null,
+    "iterations": null,
+    "rework_or_blockers": [],
+    "claims_from_conversation": []
+  },
+  "project_trace": {
+    "workspace_or_repo": null,
+    "files_or_artifacts_reviewed": [],
+    "git_revision": null,
+    "checks_run": [],
+    "deployment_or_adoption_evidence": []
   },
   "evidence": [
     {
@@ -62,7 +79,10 @@ Return one valid JSON object after the human-readable assessment. Use `null` for
 ## Field rules
 
 - `scenario` is one of `coding`, `research`, `writing`, `prototype`, `ops`, or `mixed`.
+- `evaluation_source` is one of `conversation`, `project`, `conversation_and_project`, or `imported_context`.
 - `status` is one of `planned`, `in_progress`, `delivered`, `adopted`, or `stopped`.
+- `conversation_trace` records what was actually visible in the Codex conversation; use `null` or an empty list when the source was not available.
+- `project_trace` records concrete workspace/repository checks; do not list files or tests that were not inspected or run.
 - `evidence[].source` and each cost `source` are `observed`, `reported`, `estimated`, or `unknown`.
 - `benefit_basis` is `monetary` only when a stated, defensible benefit estimate is available; otherwise use `qualitative`.
 - Set `net_value_usd` and `benefit_cost_ratio` only when both an estimated benefit and an estimated total cost are available.

@@ -1,11 +1,30 @@
 {
   "schema_version": "1.0",
   "verdict": "worth_it",
+  "evaluation_source": "conversation_and_project",
   "work_unit": {
     "title": "Add bilingual README navigation",
     "scenario": "coding",
     "goal": "Let Chinese- and English-speaking visitors reach the appropriate project documentation.",
-    "status": "delivered"
+    "status": "delivered",
+    "starting_state": "A single-language README.",
+    "ai_contribution": "Drafted the language switch and documentation links.",
+    "human_contribution": "Reviewed wording, accepted the change, and merged it."
+  },
+  "conversation_trace": {
+    "turns_considered": 4,
+    "iterations": 1,
+    "rework_or_blockers": [],
+    "claims_from_conversation": [
+      "The change was requested to improve access for both language audiences."
+    ]
+  },
+  "project_trace": {
+    "workspace_or_repo": "current repository",
+    "files_or_artifacts_reviewed": ["README.md", "README_EN.md", "README_ZH.md"],
+    "git_revision": null,
+    "checks_run": ["JSON parse"],
+    "deployment_or_adoption_evidence": []
   },
   "evidence": [
     {

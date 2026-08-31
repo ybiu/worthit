@@ -2,7 +2,7 @@
 
 WorthIt 不是只问「做完了吗」，而是帮助 AI 进一步判断：**这段 AI 协作，值不值？**
 
-它面向一个边界清晰的工作单元：一个功能、原型、研究轮次、文稿修改、实验或运营任务。评估会综合实际产出、证据、AI 与人工投入、不确定性，以及明确的价值量表。
+它默认评估当前 Codex 对话和/或项目，而不是要求你复制粘贴一段文字。评估会综合对话中的目标、迭代和返工，以及项目文件、Git、测试和部署等实际证据，再判断 AI 与人工投入是否值得。
 
 ## 安装
 
@@ -21,8 +21,10 @@ npx skills add ybiu/worthit --skill worthit -g
 在任务中直接使用：
 
 ```text
-Use $worthit to evaluate this AI-assisted work: [粘贴任务背景、投入、结果与证据]
+Use $worthit to evaluate this Codex conversation and project from the available evidence.
 ```
+
+WorthIt 会先读取当前任务上下文；如果是代码项目，还会检查相关文件、Git 历史、测试和部署信息。只有当前对话或项目不可访问时，才需要你手动提供上下文。
 
 ## 你会得到什么
 
