@@ -53,6 +53,12 @@ def locale(language: str) -> dict[str, str]:
             "limits": "说明与限制",
             "no_add": "API 等价成本和订阅消耗估算是两种不同的视角，不能相加。",
             "zero": "只有记录明确证明数值为零时才显示 0。",
+            "eyebrow": "WorthIt · 成本洞察",
+            "cost_detail": "输入、缓存和输出分别计价。",
+            "subscription_detail": "已购套餐的比例分摊，不代表新增收费。",
+            "limits_detail": "如何理解这些数字。",
+            "estimate_badge": "估算",
+            "separate_badge": "独立视角",
         }
     return {
         "title": "WorthIt AI cost report",
@@ -80,12 +86,19 @@ def locale(language: str) -> dict[str, str]:
         "limits": "Notes and limits",
         "no_add": "API-equivalent cost and subscription consumption are separate views and must not be added together.",
         "zero": "A zero is displayed only when the record explicitly proves a zero value.",
+        "eyebrow": "WorthIt · cost intelligence",
+        "cost_detail": "Input, cache, and output are priced independently.",
+        "subscription_detail": "A proportional allocation of an existing plan, not an extra charge.",
+        "limits_detail": "How to read these numbers.",
+        "estimate_badge": "Estimate",
+        "separate_badge": "Separate view",
     }
 
 
-def parse_session(path: Path) -> tuple[dict[str, int], list[str]]:
+def parse_session(path: Path) -> tuple[dict[str, int], list[str], bool]:
     usage = {field: 0 for field in USAGE_FIELDS}
     models: set[str] = set()
+    usage_observed = False
     with path.open("r", encoding="utf-8") as handle:
         for line in handle:
             try:
@@ -94,6 +107,7 @@ def parse_session(path: Path) -> tuple[dict[str, int], list[str]]:
                 continue
             payload = record.get("payload", {})
             if record.get("type") == "event_msg" and payload.get("type") == "token_count":
+                usage_observed = True
                 total = payload.get("info", {}).get("total_token_usage", {})
                 for field in USAGE_FIELDS:
                     value = total.get(field)
@@ -102,7 +116,7 @@ def parse_session(path: Path) -> tuple[dict[str, int], list[str]]:
             settings = payload.get("thread_settings")
             if isinstance(settings, dict) and isinstance(settings.get("model"), str):
                 models.add(settings["model"])
-    return usage, sorted(models)
+    return usage, sorted(models), usage_observed
 
 
 def money(value: float | None, currency: str, unknown: str) -> str:
@@ -118,12 +132,12 @@ def get_price(model_prices: dict[str, Any], model: str, key: str) -> float | Non
     return float(raw) if isinstance(raw, (int, float)) and raw > 0 else None
 
 
-def calculate_api(usage: dict[str, int], models: list[str], config: dict[str, Any]) -> tuple[dict[str, float | None], str]:
+def calculate_api(usage: dict[str, int], models: list[str], config: dict[str, Any], usage_observed: bool = True) -> tuple[dict[str, float | None], str]:
     pricing = config.get("pricing", {})
     model_prices = pricing.get("models", {})
     model = models[0] if len(models) == 1 else None
     effective_date = pricing.get("effective_date")
-    if not model or not isinstance(effective_date, str) or not effective_date.strip():
+    if not usage_observed or not model or not isinstance(effective_date, str) or not effective_date.strip():
         return {field: None for field in USAGE_FIELDS} | {"total": None}, "unknown"
     remaining_input = max(0, usage["input_tokens"] - usage["cached_input_tokens"] - usage["cache_write_input_tokens"])
     quantities = {
@@ -221,12 +235,14 @@ def render(usage: dict[str, int], models: list[str], api: dict[str, float | None
     lang_attr = "zh-CN" if language == "zh-CN" else "en"
     return f"""<!doctype html>
 <html lang=\"{lang_attr}\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>{html.escape(t['title'])}</title>
-<style>:root{{font-family:system-ui,sans-serif;color:#172033}}body{{margin:0;background:#edf2f6}}main{{max-width:860px;margin:28px auto;padding:28px;background:#fff;box-shadow:0 8px 30px #17203314}}h1,h2{{margin:0 0 10px}}h2{{margin-top:28px;font-size:1.15rem}}p{{line-height:1.55}}table{{width:100%;border-collapse:collapse}}th,td{{text-align:left;padding:9px;border-bottom:1px solid #dbe2ec;vertical-align:top}}th{{background:#f4f8f8}}.note{{color:#5e6b82}}.warning{{padding:12px;border-left:4px solid #d97706;background:#fff7ed}}@media(max-width:640px){{main{{margin:0;padding:18px}}}}</style>
-</head><body><main><header><h1>{html.escape(t['title'])}</h1><p class=\"note\">{html.escape(t['subtitle'])}</p></header>
-<section><h2>{html.escape(t['api'])}</h2><table><thead><tr><th>{html.escape(t['item'])}</th><th>{html.escape(t['tokens'])}</th><th>{html.escape(t['unit_price'])}</th><th>{html.escape(t['cost'])}</th><th>{html.escape(t['source'])}</th></tr></thead><tbody>{''.join(api_rows)}</tbody></table><p class=\"note\">{html.escape(t['estimate'])}</p></section>
-<section><h2>{html.escape(t['subscription'])}</h2><table><thead><tr><th>{html.escape(t['item'])}</th><th>{html.escape(t['tokens'])}</th><th>{html.escape(t['unit_price'])}</th><th>{html.escape(t['cost'])}</th><th>{html.escape(t['source'])}</th></tr></thead><tbody>{''.join(sub_rows)}</tbody></table><p class=\"note\">{html.escape(t['estimate'])}</p></section>
-<section><h2>{html.escape(t['limits'])}</h2><p class=\"warning\">{html.escape(t['no_add'])}<br>{html.escape(t['missing'])}<br>{html.escape(t['zero'])}</p></section>
-</main></body></html>"""
+<style>
+:root{{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#182235;background:#eef3f7;--ink:#182235;--muted:#66748a;--line:#dfe7ef;--panel:#fff;--soft:#f6f9fb;--brand:#087f73;--brand-soft:#e2f5f1;--amber:#a34e08;--amber-soft:#fff4e8;--shadow:0 18px 45px rgba(26,49,72,.09)}}
+*{{box-sizing:border-box}} body{{margin:0;min-height:100vh;background:radial-gradient(circle at 0 0,#dff5f1 0,transparent 34%),#eef3f7;color:var(--ink)}} main{{max-width:980px;margin:32px auto;padding:0 18px 42px}}.shell{{background:var(--panel);border:1px solid rgba(223,231,239,.9);border-radius:24px;box-shadow:var(--shadow);overflow:hidden}}header{{padding:34px 36px 30px;background:linear-gradient(135deg,#f7fffd,#fff 58%);border-bottom:1px solid var(--line)}}h1{{margin:0 0 9px;font-size:clamp(1.55rem,3vw,2.35rem);letter-spacing:-.03em}}h2{{margin:0;font-size:1.08rem;letter-spacing:-.01em}}p{{line-height:1.6}}.note,.source{{color:var(--muted)}}.eyebrow{{margin:0 0 10px;color:var(--brand);font-size:.74rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase}}.subtitle{{max-width:680px;margin:0;color:var(--muted)}}.section{{padding:28px 36px;border-bottom:1px solid var(--line)}}.section:last-child{{border-bottom:0}}.section-head{{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px}}.section-kicker{{margin:4px 0 0;color:var(--muted);font-size:.86rem}}.badge{{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:var(--brand-soft);color:#07665d;font-size:.8rem;font-weight:750;white-space:nowrap}}.badge::before{{content:"";width:7px;height:7px;border-radius:50%;background:var(--brand)}}.cost-grid{{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 18px}}.metric{{padding:16px;border:1px solid var(--line);border-radius:16px;background:var(--soft)}}.metric-label{{display:block;color:var(--muted);font-size:.82rem;margin-bottom:7px}}.metric-value{{font-size:1.3rem;font-weight:800;letter-spacing:-.02em}}.metric-value.unknown{{color:var(--muted);font-size:1.1rem}}.table-wrap{{overflow-x:auto;border:1px solid var(--line);border-radius:14px}}table{{width:100%;min-width:690px;border-collapse:collapse}}th,td{{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top;font-size:.9rem}}th{{background:var(--soft);font-size:.76rem;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}}tr:last-child td,tr:last-child th{{border-bottom:0}}tbody tr:hover{{background:#fbfdfd}}.estimate{{margin:12px 0 0;font-size:.86rem;color:var(--muted)}}.warning{{margin:0;padding:15px 17px;border-left:4px solid #e18b2c;border-radius:0 12px 12px 0;background:var(--amber-soft);color:#71400f}}ul{{margin:8px 0;padding-left:22px}}code{{padding:2px 5px;border-radius:5px;background:#edf2f6}}@media(max-width:720px){{main{{margin:0;padding:0 10px 24px}}.shell{{border-radius:18px}}header,.section{{padding:24px 20px}}.cost-grid{{grid-template-columns:1fr 1fr}}.section-head{{display:block}}.section-head .badge{{margin-top:10px}}}}@media(max-width:440px){{.cost-grid{{grid-template-columns:1fr}}h1{{font-size:1.55rem}}}}
+</style></head><body><main><div class=\"shell\"><header><p class=\"eyebrow\">{html.escape(t['eyebrow'])}</p><h1>{html.escape(t['title'])}</h1><p class=\"subtitle\">{html.escape(t['subtitle'])}</p></header>
+<section class=\"section\"><div class=\"section-head\"><div><h2>{html.escape(t['api'])}</h2><p class=\"section-kicker\">{html.escape(t['cost_detail'])}</p></div><span class=\"badge\">{html.escape(t['estimate_badge'])}</span></div><div class=\"cost-grid\"><div class=\"metric\"><span class=\"metric-label\">{html.escape(t['input'])}</span><strong class=\"metric-value {'unknown' if api['input_tokens'] is None else ''}\">{html.escape(money(api['input_tokens'], currency, t['unknown']))}</strong></div><div class=\"metric\"><span class=\"metric-label\">{html.escape(t['output'])}</span><strong class=\"metric-value {'unknown' if api['output_tokens'] is None else ''}\">{html.escape(money(api['output_tokens'], currency, t['unknown']))}</strong></div><div class=\"metric\"><span class=\"metric-label\">{html.escape(t['total'])}</span><strong class=\"metric-value {'unknown' if api['total'] is None else ''}\">{html.escape(money(api['total'], currency, t['unknown']))}</strong></div></div><div class=\"table-wrap\"><table><thead><tr><th>{html.escape(t['item'])}</th><th>{html.escape(t['tokens'])}</th><th>{html.escape(t['unit_price'])}</th><th>{html.escape(t['cost'])}</th><th>{html.escape(t['source'])}</th></tr></thead><tbody>{''.join(api_rows)}</tbody></table></div><p class=\"estimate\">{html.escape(t['estimate'])}</p></section>
+<section class=\"section\"><div class=\"section-head\"><div><h2>{html.escape(t['subscription'])}</h2><p class=\"section-kicker\">{html.escape(t['subscription_detail'])}</p></div><span class=\"badge\">{html.escape(t['separate_badge'])}</span></div><div class=\"table-wrap\"><table><thead><tr><th>{html.escape(t['item'])}</th><th>{html.escape(t['tokens'])}</th><th>{html.escape(t['unit_price'])}</th><th>{html.escape(t['cost'])}</th><th>{html.escape(t['source'])}</th></tr></thead><tbody>{''.join(sub_rows)}</tbody></table></div><p class=\"estimate\">{html.escape(t['estimate'])}</p></section>
+<section class=\"section\"><div class=\"section-head\"><div><h2>{html.escape(t['limits'])}</h2><p class=\"section-kicker\">{html.escape(t['limits_detail'])}</p></div></div><p class=\"warning\">{html.escape(t['no_add'])}<br>{html.escape(t['missing'])}<br>{html.escape(t['zero'])}</p></section>
+</div></main></body></html>"""
 
 
 def main() -> int:
@@ -238,8 +254,8 @@ def main() -> int:
     args = parser.parse_args()
     with args.config.open("rb") as handle:
         config = tomllib.load(handle)
-    usage, models = parse_session(args.session)
-    api, api_source = calculate_api(usage, models, config)
+    usage, models, usage_observed = parse_session(args.session)
+    api, api_source = calculate_api(usage, models, config, usage_observed)
     report = render(usage, models, api, api_source, subscription_estimate(config), config, args.language)
     args.output.write_text(report, encoding="utf-8")
     return 0
