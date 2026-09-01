@@ -33,6 +33,7 @@ WorthIt inspects the current task context first. For coding work it also checks 
 - A self-contained HTML report that can be saved and shared
 - AI cost shown first, with input and output calculated separately when evidence permits
 - Report labels and prose localized to the user's conversation language
+- A final prompt-engineering critique based on the actual input, with optional rewritten prompt
 - A candid account of assumptions, unknowns, and the next measurement worth collecting
 
 ## What it does not do

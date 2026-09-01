@@ -14,6 +14,7 @@ Use semantic HTML with one `<main>` element and these sections, in order:
 6. **Value scorecard:** an accessible table of applicable 0–5 scores with one-line evidence for each score. Omit irrelevant dimensions.
 7. **ROI and limits:** show monetary benefit, net value, and benefit/cost ratio only when their basis is defensible; otherwise say `定性判断` or `Qualitative` in the report language and explain why.
 8. **Next measurement:** the smallest follow-up that could change the verdict.
+9. **Prompt engineering recommendations (last section):** analyze the user's input quality and provide actionable improvements. Cover only dimensions relevant to the actual input: goal, context, constraints, acceptance criteria, evidence, and output format. Optionally include a short improved prompt.
 
 ## Presentation rules
 
@@ -24,6 +25,8 @@ Use semantic HTML with one `<main>` element and these sections, in order:
 - Set `<html lang>` to `zh-CN` for Chinese or `en` for English, based on the report-language rules in `SKILL.md`.
 - Use one consistent report language for all visible labels and prose; do not default to bilingual labels.
 - Keep the report concise enough to scan, but include enough evidence to audit the verdict.
+- Keep prompt recommendations distinct from the verdict and value scorecard; they assess how to ask for better work, not whether the delivered work was valuable.
+- Do not quote or expose secrets, credentials, private paths, or unnecessary personal data while analyzing the input.
 
 ## Cost calculation rules
 

@@ -51,9 +51,12 @@ Return, in this order:
 1. State the evaluation source (`conversation`, `project`, `conversation_and_project`, or `imported_context`) and a short verdict with the strongest evidence and biggest caveat.
 2. Return one complete, self-contained HTML document following [the HTML output contract](references/output-contract.md). Do not return JSON. Do not wrap the document in a Markdown code fence unless the user explicitly asks for source code.
 3. Ensure the first report section after the header is AI cost, with input and output shown separately.
-4. Name the minimum next measurement or follow-up that could change the verdict, if one exists.
+4. Make the final report section **Prompt engineering recommendations / 提示词工程建议**. Analyze the user's actual requests in this conversation (or imported input when that is the declared source), then give concrete suggestions for improving goal clarity, context, constraints, acceptance criteria, evidence, and output format. Include a concise rewritten prompt only when it would materially help.
+5. Name the minimum next measurement or follow-up that could change the verdict, if one exists; it may appear immediately before the final recommendations section.
 
 Keep the result candid and decision-useful. Do not invent a baseline, business value, adoption, or causal link between AI usage and outcome. When the record is incomplete, explain the uncertainty rather than forcing a precise ROI.
+
+Prompt recommendations are a separate usability critique. Do not let a well-written prompt increase project value scores, and do not penalize a valuable outcome merely because the user's initial request was terse. Do not reproduce secrets, private credentials, or unnecessary personal data from the conversation.
 
 ## References
 
