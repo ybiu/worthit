@@ -32,13 +32,25 @@ Never pretend to see hidden provider billing, unshown turns, private files, or e
    - `not_worth_it` — available evidence shows a poor cost-to-value fit.
 7. Compute monetary ROI only when the benefit estimate has a stated basis. Otherwise use a qualitative assessment; tokens alone are not a measure of value.
 
+### Cost data safeguards
+
+- Treat missing, inaccessible, or unexposed usage as `unknown`, never as `0`.
+- A numeric zero is allowed only when the conversation, provider record, or project evidence explicitly says that the quantity was zero or free; label that source.
+- Before delivering the report, scan every AI cost cell. If an input/output token count, unit price, or cost is `0` without explicit evidence, replace it with `未知`/`Unknown` and add the field to the limits.
+
+### Report language
+
+- Follow an explicit language request first.
+- Otherwise detect the language of the user's current conversation. Use the dominant language of the user's substantive messages; if mixed, use the latest substantive user message as the tie-breaker.
+- Write all visible labels, headings, verdict text, explanations, and the `<html lang>` attribute in that language. Do not show bilingual labels by default. Use bilingual text only when the user asks for it.
+
 ## Return
 
 Return, in this order:
 
 1. State the evaluation source (`conversation`, `project`, `conversation_and_project`, or `imported_context`) and a short verdict with the strongest evidence and biggest caveat.
-2. Give a concise scorecard with only applicable dimensions.
-3. Return one complete, self-contained HTML document following [the HTML output contract](references/output-contract.md). Do not return JSON. Do not wrap the document in a Markdown code fence unless the user explicitly asks for source code.
+2. Return one complete, self-contained HTML document following [the HTML output contract](references/output-contract.md). Do not return JSON. Do not wrap the document in a Markdown code fence unless the user explicitly asks for source code.
+3. Ensure the first report section after the header is AI cost, with input and output shown separately.
 4. Name the minimum next measurement or follow-up that could change the verdict, if one exists.
 
 Keep the result candid and decision-useful. Do not invent a baseline, business value, adoption, or causal link between AI usage and outcome. When the record is incomplete, explain the uncertainty rather than forcing a precise ROI.
