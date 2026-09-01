@@ -1,0 +1,24 @@
+# Copy this file outside the repository, fill only values you can support,
+# then pass it to scripts/codex_cost_report.py with --config.
+
+[pricing]
+currency = "USD"
+effective_date = "YYYY-MM-DD"
+source = "Official public API pricing URL or exported price table"
+
+# Keep this table current. Omit a price when it is unavailable: the report will
+# show Unknown instead of treating it as free.
+[pricing.models]
+
+[pricing.models."exact-model-name"]
+# input_per_million = 0.00
+# cached_input_per_million = 0.00
+# cache_write_input_per_million = 0.00
+# output_per_million = 0.00
+
+[subscription]
+# Subscription allocation is optional. It is never an invoice.
+# period_cost_usd = 0.0
+# task_usage_share = 0.0
+# basis = "provider-reported quota share"
+# source = "Account usage screen, exported quota report, or user calculation"

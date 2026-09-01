@@ -38,6 +38,15 @@ Never pretend to see hidden provider billing, unshown turns, private files, or e
 - A numeric zero is allowed only when the conversation, provider record, or project evidence explicitly says that the quantity was zero or free; label that source.
 - Before delivering the report, scan every AI cost cell. If an input/output token count, unit price, or cost is `0` without explicit evidence, replace it with `未知`/`Unknown` and add the field to the limits.
 
+### Two cost views
+
+Keep these two figures separate in every report:
+
+- **API-equivalent cost (estimate):** price observed input, cached input, cache-write input, and output tokens using a dated public API price table for the exact model. It is a reproducible estimate, not a Codex subscription invoice.
+- **Subscription consumption estimate (estimate):** allocate the user's stated subscription-period price to this task only when a stated, defensible usage share or quota share exists. It is an allocation of subscription value, not an additional charge.
+
+When a local Codex session log and a price configuration are available, use [scripts/codex_cost_report.py](scripts/codex_cost_report.py) to read cumulative usage and produce the cost section. Use [references/cost-config.example.toml](references/cost-config.example.toml) as the configuration contract. Never substitute API-equivalent cost for subscription cost, add the two together, or call either one an invoice.
+
 ### Report language
 
 - Follow an explicit language request first.

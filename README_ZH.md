@@ -26,6 +26,10 @@ Use $worthit to evaluate this Codex conversation and project from the available 
 
 WorthIt 会先读取当前任务上下文；如果是代码项目，还会检查相关文件、Git 历史、测试和部署信息。只有当前对话或项目不可访问时，才需要你手动提供上下文。
 
+## 成本估算
+
+`scripts/codex_cost_report.py` 会读取本地 Codex 会话日志并生成独立 HTML 成本报告。复制 [`cost-config.example.toml`](worthit/references/cost-config.example.toml)，为准确模型填写有日期的公开 API 价格；也可以补充有依据的套餐使用占比。报告会将 API 等价成本和订阅分摊严格分开，它们都不是实际账单。
+
 ## 你会得到什么
 
 - 一个结论：`worth_it`、`promising`、`not_yet` 或 `not_worth_it`

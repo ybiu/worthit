@@ -22,6 +22,8 @@ npx skills add ybiu/worthit --skill worthit -g
 
 It reads the current task context first, then checks relevant project files, Git history, tests, or deployment evidence when available. It returns a self-contained HTML report with AI cost first, separate input/output cost rows, evidence, an evidence-based scorecard, and a final prompt-engineering recommendation section. Missing usage is shown as unknown, never as zero; the report follows the user's language.
 
+For Codex logs, the bundled local parser can create two clearly separated estimates: API-equivalent cost from a dated price table, and subscription consumption from an explicit usage share. It never calls either one an invoice or adds them together.
+
 ## Repository layout
 
 ```text

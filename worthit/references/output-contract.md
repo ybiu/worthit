@@ -36,4 +36,13 @@ Use semantic HTML with one `<main>` element and these sections, in order:
 - Use `0` only for a quantity explicitly confirmed as zero or free by an observed or reported source. An absent value is not zero.
 - Never equate more tokens with more value.
 
+## Two estimates, never one bill
+
+Show both rows only when their data exists:
+
+- **API-equivalent cost (estimate):** the input/cache/output token cost under the dated, configured public API price table for the exact model.
+- **Subscription consumption estimate (estimate):** `subscription period price × defensible task usage share`. Show the period, allocation basis, and source.
+
+Do not add these values. They answer different questions: API-equivalent cost is a pay-as-you-go comparison; subscription consumption is a proportional allocation of an already-purchased plan. Neither is a provider invoice.
+
 The allowed scenario values are `coding`, `research`, `writing`, `prototype`, `ops`, and `mixed`. The allowed evaluation sources are `conversation`, `project`, `conversation_and_project`, and `imported_context`.

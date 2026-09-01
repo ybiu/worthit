@@ -10,6 +10,8 @@ Thumbs.db
 
 # JavaScript dependencies and logs
 node_modules/
+__pycache__/
+*.py[cod]
 npm-debug.log*
 yarn-debug.log*
 pnpm-debug.log*

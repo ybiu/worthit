@@ -26,6 +26,10 @@ Use $worthit to evaluate this Codex conversation and project from the available 
 
 WorthIt inspects the current task context first. For coding work it also checks relevant workspace files, Git history, tests, and deployment evidence when available; it does not require you to copy-paste the conversation into a new prompt.
 
+## Cost estimates
+
+`scripts/codex_cost_report.py` reads a local Codex session log and writes a standalone HTML cost report. Copy [`cost-config.example.toml`](worthit/references/cost-config.example.toml), provide dated public API prices for the exact model, and optionally provide a defensible subscription usage share. The resulting API-equivalent estimate and subscription allocation are deliberately separate; neither is an invoice.
+
 ## What you get
 
 - A verdict: `worth_it`, `promising`, `not_yet`, or `not_worth_it`
