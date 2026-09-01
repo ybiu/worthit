@@ -20,7 +20,7 @@ Or install it directly with the Skills CLI:
 npx skills add ybiu/worthit --skill worthit -g
 ```
 
-It reads the current task context first, then checks relevant project files, Git history, tests, or deployment evidence when available. It returns a clear verdict, an evidence-based scorecard, and a machine-readable JSON record. It works even when model bills and token counts are unavailable.
+It reads the current task context first, then checks relevant project files, Git history, tests, or deployment evidence when available. It returns a self-contained HTML report with a clear verdict, separate input/output cost rows, evidence, and an evidence-based scorecard. It works even when model bills and token counts are unavailable.
 
 ## Repository layout
 
@@ -28,8 +28,8 @@ It reads the current task context first, then checks relevant project files, Git
 worthit/
 ├── SKILL.md                    # Core agent instructions
 ├── agents/openai.yaml          # Codex interface metadata
-├── references/                 # Scoring rubric and JSON contract
-└── examples/                   # Example evaluation record
+├── references/                 # Scoring rubric and HTML contract
+└── examples/                   # Example HTML report
 ```
 
 See [PRODUCT.md](PRODUCT.md) for product intent and boundaries.

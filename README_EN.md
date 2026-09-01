@@ -30,7 +30,7 @@ WorthIt inspects the current task context first. For coding work it also checks 
 
 - A verdict: `worth_it`, `promising`, `not_yet`, or `not_worth_it`
 - A scorecard grounded in delivery, practical value, quality, insight, and adoption evidence
-- A valid JSON record for comparison across work units
+- A self-contained HTML report that can be saved and shared
 - A candid account of assumptions, unknowns, and the next measurement worth collecting
 
 ## What it does not do
@@ -39,7 +39,7 @@ WorthIt does not turn token volume into value, invent financial returns, or requ
 
 ## Example
 
-See [coding-work-unit.json](worthit/examples/coding-work-unit.json) for a complete record.
+See [coding-work-unit.html](worthit/examples/coding-work-unit.html) for a complete report.
 
 ## License
 

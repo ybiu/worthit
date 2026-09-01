@@ -30,7 +30,7 @@ WorthIt 会先读取当前任务上下文；如果是代码项目，还会检查
 
 - 一个结论：`worth_it`、`promising`、`not_yet` 或 `not_worth_it`
 - 基于交付、实际价值、质量、洞察和采纳证据的评分卡
-- 便于跨任务比较的标准 JSON 记录
+- 可直接保存和分享的自包含 HTML 报告
 - 对假设、未知项和下一步关键测量的坦诚说明
 
 ## 它不会做什么
@@ -39,7 +39,7 @@ WorthIt 不会把 Token 数量直接当作价值，不会编造财务回报，�
 
 ## 示例
 
-完整示例见 [coding-work-unit.json](worthit/examples/coding-work-unit.json)。
+完整示例见 [coding-work-unit.html](worthit/examples/coding-work-unit.html)。
 
 ## 许可证
 

@@ -8,7 +8,7 @@ AI-assisted work is easy to produce and hard to evaluate. A completed task can s
 
 Given the context for one work unit, WorthIt produces a concise, evidence-led answer to: **was this work worth its AI, human, and other costs?**
 
-The answer is comparable across coding, research, writing, prototypes, and operations because it keeps the same cost categories, evidence labels, score scale, verdict vocabulary, and JSON contract.
+The answer is comparable across coding, research, writing, prototypes, and operations because it keeps the same cost categories, evidence labels, score scale, verdict vocabulary, and HTML report contract.
 
 ## Principles
 

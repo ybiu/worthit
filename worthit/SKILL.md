@@ -24,13 +24,13 @@ Never pretend to see hidden provider billing, unshown turns, private files, or e
 2. Reconstruct the goal, starting state, important iterations, AI contribution, human decisions, rework, final artifact, and outcome evidence from the available context. For a repository, use the current diff and relevant history/tests rather than relying on descriptions alone.
 3. Collect cost evidence available in the current task: exposed usage metadata, user-reported AI billing, human time visible in the interaction, and material tooling or hosting cost. Do not require token exports, model APIs, invoices, or a dollar estimate when they are unavailable.
 4. Mark each non-trivial input as `observed`, `reported`, `estimated`, or `unknown`. Never present an estimate as an invoice or measured result. Keep conversation claims and project observations separate when they conflict.
-4. Use the applicable 0–5 dimensions in [the rubric](references/rubric.md). Score from evidence; leave a dimension `null` when it does not fit the work unit.
-5. Give a verdict:
+5. Use the applicable 0–5 dimensions in [the rubric](references/rubric.md). Score from evidence; omit a dimension when it does not fit the work unit.
+6. Give a verdict:
    - `worth_it` — the delivered or likely value is well supported relative to cost.
    - `promising` — value is plausible, but decisive evidence is still missing.
    - `not_yet` — the work is too early to judge.
    - `not_worth_it` — available evidence shows a poor cost-to-value fit.
-6. Compute monetary ROI only when the benefit estimate has a stated basis. Otherwise use a qualitative assessment; tokens alone are not a measure of value.
+7. Compute monetary ROI only when the benefit estimate has a stated basis. Otherwise use a qualitative assessment; tokens alone are not a measure of value.
 
 ## Return
 
@@ -38,7 +38,7 @@ Return, in this order:
 
 1. State the evaluation source (`conversation`, `project`, `conversation_and_project`, or `imported_context`) and a short verdict with the strongest evidence and biggest caveat.
 2. Give a concise scorecard with only applicable dimensions.
-3. Return one valid JSON object following [the output contract](references/output-contract.md).
+3. Return one complete, self-contained HTML document following [the HTML output contract](references/output-contract.md). Do not return JSON. Do not wrap the document in a Markdown code fence unless the user explicitly asks for source code.
 4. Name the minimum next measurement or follow-up that could change the verdict, if one exists.
 
 Keep the result candid and decision-useful. Do not invent a baseline, business value, adoption, or causal link between AI usage and outcome. When the record is incomplete, explain the uncertainty rather than forcing a precise ROI.
@@ -46,4 +46,4 @@ Keep the result candid and decision-useful. Do not invent a baseline, business v
 ## References
 
 - Read [references/rubric.md](references/rubric.md) when assigning value scores.
-- Read [references/output-contract.md](references/output-contract.md) before producing the JSON record.
+- Read [references/output-contract.md](references/output-contract.md) before producing the HTML report.
