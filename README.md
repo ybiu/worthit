@@ -20,9 +20,9 @@ Or install it directly with the Skills CLI:
 npx skills add ybiu/worthit --skill worthit -g
 ```
 
-It reads the current task context first, then checks relevant project files, Git history, tests, or deployment evidence when available. It returns a self-contained HTML report with AI cost first, separate input/output cost rows, evidence, an evidence-based scorecard, and a final prompt-engineering recommendation section. Missing usage is shown as unknown, never as zero; the report follows the user's language.
+It reads the current task context first, then checks relevant project files, Git history, tests, or deployment evidence when available. It returns a self-contained HTML report with AI cost first, separate input/output/cache rows, token composition, evidence, an evidence-based scorecard, and a final prompt-engineering recommendation section. Missing usage is shown as unknown, never as zero; the report follows the user's language.
 
-For Codex logs, the bundled local parser can create two clearly separated estimates: API-equivalent cost from a dated price table, and subscription consumption from an explicit usage share. It never calls either one an invoice or adds them together.
+For Codex logs, the bundled local parser follows the accounting patterns used by agentacct, CodeBurn, TokenTab, and TokenTracker: it sums per-turn usage when available, otherwise differences cumulative snapshots (including reset/duplicate tolerance), normalizes cache-read/cache-write aliases, and exposes reasoning output without double-counting it. The HTML includes a cost breakdown and token cards. It can create two clearly separated estimates: API-equivalent cost from a dated price table, and subscription consumption from an explicit usage share. It never calls either one an invoice or adds them together.
 
 ## Repository layout
 

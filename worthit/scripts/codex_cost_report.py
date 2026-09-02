@@ -11,7 +11,6 @@ from __future__ import annotations
 import argparse
 import html
 import json
-import sys
 import tomllib
 from pathlib import Path
 from typing import Any
@@ -22,7 +21,31 @@ USAGE_FIELDS = (
     "cached_input_tokens",
     "cache_write_input_tokens",
     "output_tokens",
+    "reasoning_output_tokens",
 )
+
+def _canonical_usage(value: dict[str, Any]) -> dict[str, int] | None:
+    if not isinstance(value, dict):
+        return None
+    aliases = {
+        "input_tokens": ("input_tokens", "input"),
+        "cached_input_tokens": ("cached_input_tokens", "cache_read"),
+        "cache_write_input_tokens": ("cache_write_input_tokens", "cache_creation_input_tokens", "cache_write"),
+        "output_tokens": ("output_tokens", "output"),
+        "reasoning_output_tokens": ("reasoning_output_tokens", "reasoning_output"),
+    }
+    result = {}
+    found = False
+    for field, names in aliases.items():
+        raw = next((value.get(name) for name in names if value.get(name) is not None), None)
+        result[field] = int(raw) if isinstance(raw, (int, float)) and raw >= 0 else 0
+        found = found or result[field] > 0
+    return result if found or any(name in value for names in aliases.values() for name in names) else None
+
+def _delta(current: dict[str, int], previous: dict[str, int]) -> dict[str, int] | None:
+    if any(current[field] < previous[field] for field in USAGE_FIELDS):
+        return None
+    return {field: current[field] - previous[field] for field in USAGE_FIELDS}
 
 
 def locale(language: str) -> dict[str, str]:
@@ -43,6 +66,7 @@ def locale(language: str) -> dict[str, str]:
             "cached": "缓存输入 Token",
             "cache_write": "缓存写入 Token",
             "output": "输出 Token",
+            "reasoning": "推理输出 Token（已包含在输出计价中）",
             "total": "API 等价总成本",
             "subscription_cost": "本任务订阅分摊",
             "share": "任务使用占比",
@@ -76,6 +100,7 @@ def locale(language: str) -> dict[str, str]:
         "cached": "Cached input tokens",
         "cache_write": "Cache-write input tokens",
         "output": "Output tokens",
+        "reasoning": "Reasoning output tokens (included in output billing)",
         "total": "Total API-equivalent cost",
         "subscription_cost": "Task subscription allocation",
         "share": "Task usage share",
@@ -99,6 +124,8 @@ def parse_session(path: Path) -> tuple[dict[str, int], list[str], bool]:
     usage = {field: 0 for field in USAGE_FIELDS}
     models: set[str] = set()
     usage_observed = False
+    baselines: list[dict[str, int]] = []
+    seen: set[tuple[int, ...]] = set()
     with path.open("r", encoding="utf-8") as handle:
         for line in handle:
             try:
@@ -108,11 +135,27 @@ def parse_session(path: Path) -> tuple[dict[str, int], list[str], bool]:
             payload = record.get("payload", {})
             if record.get("type") == "event_msg" and payload.get("type") == "token_count":
                 usage_observed = True
-                total = payload.get("info", {}).get("total_token_usage", {})
-                for field in USAGE_FIELDS:
-                    value = total.get(field)
-                    if isinstance(value, int) and value >= 0:
-                        usage[field] = max(usage[field], value)
+                info = payload.get("info", {})
+                last = _canonical_usage(info.get("last_token_usage", {}))
+                if last is not None:
+                    for field in USAGE_FIELDS:
+                        usage[field] += last[field]
+                else:
+                    total = _canonical_usage(info.get("total_token_usage", {}))
+                    if total is not None:
+                        signature = tuple(total[field] for field in USAGE_FIELDS)
+                        if signature not in seen:
+                            seen.add(signature)
+                            candidates = [(i, old) for i, old in enumerate(baselines) if _delta(total, old) is not None]
+                            if candidates:
+                                i, old = min(candidates, key=lambda pair: sum(total.values()) - sum(pair[1].values()))
+                                delta = _delta(total, old) or {field: 0 for field in USAGE_FIELDS}
+                                baselines[i] = total
+                            else:
+                                delta = total
+                                baselines.append(total)
+                            for field in USAGE_FIELDS:
+                                usage[field] += delta[field]
             settings = payload.get("thread_settings")
             if isinstance(settings, dict) and isinstance(settings.get("model"), str):
                 models.add(settings["model"])
@@ -128,8 +171,14 @@ def token_value(value: int, unknown: str) -> str:
 
 
 def get_price(model_prices: dict[str, Any], model: str, key: str) -> float | None:
-    raw = model_prices.get(model, {}).get(key)
-    return float(raw) if isinstance(raw, (int, float)) and raw > 0 else None
+    normalized = model.split("/", 1)[-1]
+    names = sorted((name for name in model_prices if name == model or name == normalized or name in model or normalized in name), key=len, reverse=True)
+    for name in names:
+        entry = model_prices.get(name, {})
+        raw = entry.get(key) if isinstance(entry, dict) else None
+        if isinstance(raw, (int, float)) and raw >= 0:
+            return float(raw)
+    return None
 
 
 def calculate_api(usage: dict[str, int], models: list[str], config: dict[str, Any], usage_observed: bool = True) -> tuple[dict[str, float | None], str]:
@@ -156,12 +205,13 @@ def calculate_api(usage: dict[str, int], models: list[str], config: dict[str, An
     active_missing = False
     for field, quantity in quantities.items():
         if quantity == 0:
-            result[field] = 0.0
+            result[field] = None
             continue
         price = get_price(model_prices, model, price_keys[field])
         result[field] = None if price is None else quantity * price / 1_000_000
         active_missing = active_missing or result[field] is None
-    result["total"] = None if active_missing else sum(value or 0.0 for value in result.values())
+    result["reasoning_output_tokens"] = None
+    result["total"] = None if active_missing else sum(value or 0.0 for field, value in result.items() if field != "reasoning_output_tokens")
     source = "configured_public_price" if result["total"] is not None else "unknown"
     return result, source
 
@@ -195,22 +245,25 @@ def render(usage: dict[str, int], models: list[str], api: dict[str, float | None
     model_prices = config.get("pricing", {}).get("models", {})
     prices = model_prices.get(model, {}) if model else {}
     price_by_field = {
-        "input_tokens": prices.get("input_per_million"),
-        "cached_input_tokens": prices.get("cached_input_per_million"),
-        "cache_write_input_tokens": prices.get("cache_write_input_per_million"),
-        "output_tokens": prices.get("output_per_million"),
+        "input_tokens": get_price(model_prices, model, "input_per_million") if model else None,
+        "cached_input_tokens": get_price(model_prices, model, "cached_input_per_million") if model else None,
+        "cache_write_input_tokens": get_price(model_prices, model, "cache_write_input_per_million") if model else None,
+        "output_tokens": get_price(model_prices, model, "output_per_million") if model else None,
+        "reasoning_output_tokens": get_price(model_prices, model, "output_per_million") if model else None,
     }
     labels = {
         "input_tokens": t["input"],
         "cached_input_tokens": t["cached"],
         "cache_write_input_tokens": t["cache_write"],
         "output_tokens": t["output"],
+        "reasoning_output_tokens": t["reasoning"],
     }
     quantities = {
         "input_tokens": standard_input,
         "cached_input_tokens": usage["cached_input_tokens"],
         "cache_write_input_tokens": usage["cache_write_input_tokens"],
         "output_tokens": usage["output_tokens"],
+        "reasoning_output_tokens": usage["reasoning_output_tokens"],
     }
     api_rows = [
         row(t["model"], model_label, t["unknown"], t["unknown"], "observed" if models else "unknown"),
@@ -218,11 +271,11 @@ def render(usage: dict[str, int], models: list[str], api: dict[str, float | None
             row(
                 labels[field],
                 token_value(quantities[field], t["unknown"]),
-                t["unknown"] if not isinstance(price_by_field[field], (int, float)) or price_by_field[field] <= 0 else f"{currency} {float(price_by_field[field]):,.4f}",
-                money(api[field], currency, t["unknown"]),
+                t["unknown"] if not isinstance(price_by_field[field], (int, float)) or price_by_field[field] < 0 else f"{currency} {float(price_by_field[field]):,.4f}",
+                (t["reasoning"] if field == "reasoning_output_tokens" and quantities[field] else money(api[field], currency, t["unknown"])),
                 api_source,
             )
-            for field in ("input_tokens", "cached_input_tokens", "cache_write_input_tokens", "output_tokens")
+            for field in ("input_tokens", "cached_input_tokens", "cache_write_input_tokens", "output_tokens", "reasoning_output_tokens")
         ],
         row(t["total"], t["unknown"], t["unknown"], money(api["total"], currency, t["unknown"]), api_source),
     ]
@@ -232,6 +285,16 @@ def render(usage: dict[str, int], models: list[str], api: dict[str, float | None
         row(t["share"], t["unknown"] if sub_share is None else f"{sub_share:.2%}", t["unknown"], t["unknown"], sub_source),
         row(t["basis"], basis, t["unknown"], t["unknown"], sub_source),
     ]
+    parts = [(t["input"], api["input_tokens"]), (t["cached"], api["cached_input_tokens"]), (t["cache_write"], api["cache_write_input_tokens"]), (t["output"], api["output_tokens"])]
+    known = [(label, value) for label, value in parts if value is not None and value > 0]
+    total_cost = sum(value for _, value in known)
+    bars = "".join(f'<div class="bar"><span>{html.escape(label)}</span><i style="width:{value / total_cost * 100:.1f}%"></i><em>{money(value, currency, t["unknown"])}</em></div>' for label, value in known) or f'<p>{html.escape(t["unknown"])}</p>'
+    token_cards = "".join(f'<div class="token-card"><small>{html.escape(label)}</small><strong>{html.escape(token_value(value, t["unknown"]))}</strong></div>' for label, value in ((t["input"], usage["input_tokens"]), (t["cached"], usage["cached_input_tokens"]), (t["cache_write"], usage["cache_write_input_tokens"]), (t["output"], usage["output_tokens"]), (t["reasoning"], usage["reasoning_output_tokens"])))
+    cost_parts = [(t["input"], api.get("input_tokens")), (t["cached"], api.get("cached_input_tokens")), (t["cache_write"], api.get("cache_write_input_tokens")), (t["output"], api.get("output_tokens"))]
+    known_parts = [(label, value) for label, value in cost_parts if value is not None and value > 0]
+    cost_sum = sum(value for _, value in known_parts)
+    bars = "".join(f'<div class="bar"><span>{html.escape(label)}</span><i style="width:{value / cost_sum * 100:.1f}%"></i><em>{money(value, currency, t["unknown"])}</em></div>' for label, value in known_parts) or f'<p>{html.escape(t["unknown"])}</p>'
+    token_cards = "".join(f'<div class="token-card"><small>{html.escape(label)}</small><strong>{html.escape(token_value(value, t["unknown"]))}</strong></div>' for label, value in ((t["input"], usage["input_tokens"]), (t["cached"], usage["cached_input_tokens"]), (t["cache_write"], usage["cache_write_input_tokens"]), (t["output"], usage["output_tokens"]), (t["reasoning"], usage["reasoning_output_tokens"])))
     lang_attr = "zh-CN" if language == "zh-CN" else "en"
     return f"""<!doctype html>
 <html lang=\"{lang_attr}\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>{html.escape(t['title'])}</title>
@@ -263,3 +326,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
