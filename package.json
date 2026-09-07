@@ -1,0 +1,14 @@
+{
+  "name": "worthit",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Local-first AI work ledger for cost, evidence, and value.",
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev": "npm --workspace @worthit/web run dev",
+    "build": "npm --workspace @worthit/web run build",
+    "typecheck": "npm --workspace @worthit/web run typecheck",
+    "test": "node --test packages/storage/test/node.test.mjs"
+  },
+  "engines": { "node": ">=20" }
+}
