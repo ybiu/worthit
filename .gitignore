@@ -12,9 +12,14 @@ Thumbs.db
 node_modules/
 __pycache__/
 *.py[cod]
+apps/web/dist/
+*.tsbuildinfo
 npm-debug.log*
 yarn-debug.log*
 pnpm-debug.log*
+
+# Local WorthIt SQLite ledger
+.worthit/
 
 # Generated local reports
 worthit-report.html
